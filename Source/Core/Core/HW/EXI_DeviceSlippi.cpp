@@ -1626,11 +1626,9 @@ bool CEXISlippi::shouldSkipOnlineFrame(s32 frame)
 
 bool CEXISlippi::shouldAdvanceOnlineFrame(s32 frame)
 {
-	// Return true if we are over 60% of a frame ahead of our opponent. Currently limiting how
-	// often this happens because I'm worried about jittery data causing a lot of unneccesary delays.
-	// Only skip once for a given frame because our time detection method doesn't take into consideration
-	// waiting for a frame. Also it's less jarring and it happens often enough that it will smoothly
-	// get to the right place
+	// Return true if we are over 60% of a frame behind our opponent. We limit how often this happens
+	// to get a reliable average to act on. We will allow advancing up to 5 frames (spread out) over
+	// the 30 frame period. This makes the game feel relatively smooth still
 	auto isTimeSyncFrame = frame % SLIPPI_ONLINE_LOCKSTEP_INTERVAL; // Only time sync every 30 frames
 	if (isTimeSyncFrame == 0 && !isCurrentlyAdvancing)
 	{
