@@ -37,9 +37,8 @@
 // #include "Core/PatchEngine.h"
 #include "Core/PowerPC/PowerPC.h"
 
-// Not clean but idk a better way atm
-// #include "DolphinWX/Frame.h"
-// #include "DolphinWX/Main.h"
+// For LowerRenderWindow
+#include "UICommon/UICommon.h"
 
 // The Rust library that houses a "shadow" EXI Device that we can call into.
 #include "SlippiRustExtensions.h"
@@ -2815,6 +2814,7 @@ void CEXISlippi::handleLogInRequest()
 	if (!logInRes)
 	{
 		// main_frame->LowerRenderWindow();
+		UICommon::LowerRenderWindow();
 		user->OpenLogInPage();
 		user->ListenForLogIn();
 	}
