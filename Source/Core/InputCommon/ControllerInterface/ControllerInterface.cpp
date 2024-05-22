@@ -40,6 +40,8 @@
 
 using namespace ciface::ExpressionParser;
 
+extern bool g_needInputForFrame; // from EXI_DeviceSlippi.cpp
+
 namespace
 {
 const ControlState INPUT_DETECT_THRESHOLD = 0.55;
@@ -217,6 +219,8 @@ void ControllerInterface::UpdateInput()
 		std::lock_guard<std::mutex> lk(m_devices_mutex, std::adopt_lock);
 		for (const auto& d : m_devices)
 			d->UpdateInput();
+
+		g_needInputForFrame = false;
 	}
 }
 
