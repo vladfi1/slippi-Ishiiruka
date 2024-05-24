@@ -20,6 +20,7 @@
 #include "InputCommon/ControllerInterface/ControllerInterface.h"
 #include "InputCommon/ControllerInterface/Pipes/Pipes.h"
 #include "Core/ConfigManager.h"
+#include "Common/Logging/Log.h"
 
 namespace ciface
 {
@@ -168,6 +169,7 @@ void PipeDevice::UpdateInput()
   #ifndef _WIN32
   if(wait_for_inputs)
   {
+    WARN_LOG(SLIPPI, "wait_for_inputs");
     fd_set set;
     FD_ZERO (&set);
     FD_SET (m_fd, &set);
@@ -201,6 +203,8 @@ void PipeDevice::UpdateInput()
       newline = m_buf.find("\n");
     }
   } while(!finished && wait_for_inputs);
+  if (wait_for_inputs)
+    WARN_LOG(SLIPPI, "got_inputs");
 }
 
 void PipeDevice::AddAxis(const std::string& name, double value)

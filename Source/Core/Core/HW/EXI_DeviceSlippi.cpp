@@ -3200,6 +3200,7 @@ void CEXISlippi::DMAWrite(u32 _uAddr, u32 _uSize)
 
 	if (byte == CMD_MENU_FRAME)
 	{
+    WARN_LOG(SLIPPI, "CMD_MENU_FRAME");
 		m_slippiserver->write(&memPtr[0], _uSize);
 		g_needInputForFrame = true;
 		return;
@@ -3214,6 +3215,7 @@ void CEXISlippi::DMAWrite(u32 _uAddr, u32 _uSize)
 	while (bufLoc < _uSize)
 	{
 		byte = memPtr[bufLoc];
+    WARN_LOG(SLIPPI, "command: 0x%x", byte);
 		// INFO_LOG(SLIPPI, "EXI SLIPPI: Loc: %d, Size: %d, Cmd: 0x%x", bufLoc, _uSize, byte);
 		if (!payloadSizes.count(byte))
 		{
