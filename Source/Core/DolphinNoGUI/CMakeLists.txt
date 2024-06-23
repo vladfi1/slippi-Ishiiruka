@@ -29,7 +29,7 @@ if(DIS_PLAYBACK)
 endif()
 
 corrosion_import_crate(MANIFEST_PATH ${CMAKE_SOURCE_DIR}/Externals/SlippiRustExtensions/Cargo.toml ${RUST_FEATURES})
-target_link_libraries(dolphin-nogui PUBLIC slippi-rust-extensions)
+target_link_libraries(dolphin-nogui PUBLIC slippi_rust_extensions)
 
 set(CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_EXECUTABLES} dolphin-nogui)
 install(TARGETS dolphin-nogui RUNTIME DESTINATION ${bindir})
