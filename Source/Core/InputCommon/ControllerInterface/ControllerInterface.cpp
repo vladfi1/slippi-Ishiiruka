@@ -3,6 +3,7 @@
 // Refer to the license.txt file included.
 
 #include <mutex>
+#include <functional>
 
 #include "Common/Thread.h"
 #include "InputCommon/ControllerInterface/ControllerInterface.h"

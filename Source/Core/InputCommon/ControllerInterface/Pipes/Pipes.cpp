@@ -217,7 +217,7 @@ void PipeDevice::AddAxis(const std::string& name, double value)
 u8 FloatToU8(double value)
 {
   // Match the empirical behavior of the named pipes.
-  s8 raw = std::floor((value - 0.5) * 254);
+  s8 raw = static_cast<s8>(std::floor((value - 0.5) * 254));
   return reinterpret_cast<u8 &>(raw);
 }
 
