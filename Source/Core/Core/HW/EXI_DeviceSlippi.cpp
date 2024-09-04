@@ -3382,6 +3382,11 @@ void CEXISlippi::DMAWrite(u32 _uAddr, u32 _uSize)
 			break;
 		}
 		case CMD_OVERWRITE_INPUTS:
+			// Overwrite controller states from Pipe inputs used by bots.
+			// A custom gecko code is required; see
+			// https://github.com/project-slippi/slippi-ssbm-asm/tree/feature/ai-inputs
+      // This is needed when using the fast-forward code from the same repo, as
+      // it bypasses dolphin's normal way of feeding inputs into the game.
 			prepareOverwriteInputs();
 			break;
 		default:

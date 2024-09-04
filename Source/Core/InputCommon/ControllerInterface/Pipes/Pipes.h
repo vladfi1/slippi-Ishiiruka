@@ -74,6 +74,9 @@ private:
   std::string m_buf;
   std::map<std::string, PipeInput*> m_buttons;
   std::map<std::string, PipeInput*> m_axes;
+
+  // This is used for an alternative input method that writes the controller
+  // state directly into game memory; see EXI_DeviceSlippi::prepareOverwriteInputs()
   SlippiPad m_current_pad;
 };
 }
