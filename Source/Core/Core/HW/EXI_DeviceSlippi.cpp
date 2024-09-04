@@ -31,6 +31,7 @@
 
 #include "Core/HW/EXI_DeviceSlippi.h"
 #include "Core/HW/SystemTimers.h"
+#include "Core/HW/GCPad.h"
 #include "Core/State.h"
 
 #include "Core/GeckoCode.h"
@@ -41,7 +42,9 @@
 #include "DolphinWX/Frame.h"
 #include "DolphinWX/Main.h"
 
+#include "InputCommon/InputConfig.h"
 #include "InputCommon/ControllerInterface/ControllerInterface.h"
+#include "InputCommon/ControllerInterface/Pipes/Pipes.h"
 
 // The Rust library that houses a "shadow" EXI Device that we can call into.
 #include "SlippiRustExtensions.h"
@@ -3140,23 +3143,45 @@ void CEXISlippi::handleGetPlayerSettings()
 	m_read_queue.insert(m_read_queue.end(), data_ptr, data_ptr + sizeof(SlippiExiTypes::GetPlayerSettingsResponse));
 }
 
+std::map<int, SlippiPad> GetSlippiPads(ControllerInterface& controller_interface)
+{
+	std::map<int, SlippiPad> pads;
+
+  for(int i = 0; i < 4; i++)
+  {
+    const auto device_type = SConfig::GetInstance().m_SIDevice[i];
+    if (device_type != SIDEVICE_GC_CONTROLLER)
+      continue;
+
+    ciface::Core::DeviceQualifier& dq = Pad::GetConfig()->GetController(i)->default_device;
+    std::shared_ptr<ciface::Core::Device> d = controller_interface.FindDevice(dq);
+
+    if (d->GetSource() == "Pipe")
+    {
+      ciface::Pipes::PipeDevice* pd = (ciface::Pipes::PipeDevice*)d.get();
+      pads[i] = pd->GetSlippiPad();
+    }
+  }
+  return pads;
+}
+
 void CEXISlippi::prepareOverwriteInputs()
 {
 	m_read_queue.clear();
 	// If blocking pipe input is configured, this will block until pipe input is sent for this frame
 	g_controller_interface.UpdateInput();
-	std::map<int, SlippiPad> pads =	g_controller_interface.GetSlippiPads();
+	std::map<int, SlippiPad> pads =	GetSlippiPads(g_controller_interface);
 
 	// Insert the pads
-	for (int i = 1; i <= 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if (pads.count(i-1) != 0)
+		if (pads.count(i) != 0)
 		{
 			// Do overwrite this port
 			m_read_queue.push_back(1);
 			for (int j = 0; j < SLIPPI_PAD_DATA_SIZE; j++)
 			{
-				m_read_queue.push_back(pads[i-1].padBuf[j]);
+				m_read_queue.push_back(pads[i].padBuf[j]);
 			}
 		}
 		else
