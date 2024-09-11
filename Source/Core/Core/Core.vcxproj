@@ -197,7 +197,9 @@
     <ClCompile Include="HW\EXI_DeviceIPL.cpp" />
     <ClCompile Include="HW\EXI_DeviceMemoryCard.cpp" />
     <ClCompile Include="HW\EXI_DeviceMic.cpp" />
-    <ClCompile Include="HW\EXI_DeviceSlippi.cpp" />
+    <ClCompile Include="HW\EXI_DeviceSlippi.cpp">
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Include="HW\GCKeyboard.cpp" />
     <ClCompile Include="HW\GCKeyboardEmu.cpp" />
     <ClCompile Include="HW\GCMemcard.cpp" />
