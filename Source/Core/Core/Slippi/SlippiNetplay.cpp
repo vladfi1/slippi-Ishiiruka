@@ -92,6 +92,7 @@ SlippiNetplayClient::SlippiNetplayClient(std::vector<std::string> addrs, std::ve
 		this->lastFrameTiming[i] = FrameTiming();
 		this->pingUs[i] = 0;
 		this->lastFrameAcked[i] = 0;
+		this->m_remote_dolphin_type[i] = DolphinType::STANDARD;
 	}
 
 	SLIPPI_NETPLAY = std::move(this);
@@ -517,6 +518,36 @@ unsigned int SlippiNetplayClient::OnData(sf::Packet &packet, ENetPeer *peer)
 		remote_sync_states[pIdx] = results;
 	}
 	break;
+
+  case NP_MSG_SLIPPI_DOLPHIN_TYPE:
+  {
+    u8 packet_player_port;
+    if (!(packet >> packet_player_port))
+    {
+      ERROR_LOG(SLIPPI_ONLINE, "Netplay packet too small to read player index");
+      break;
+    }
+    u8 p_idx = PlayerIdxFromPort(packet_player_port);
+    if (p_idx >= m_remotePlayerCount)
+    {
+      ERROR_LOG(SLIPPI_ONLINE, "Got packet with invalid player idx {}", p_idx);
+      break;
+    }
+    u8 dolphin_type;
+    if (!(packet >> dolphin_type))
+    {
+      ERROR_LOG(SLIPPI_ONLINE, "Netplay packet too small to read dolphin type");
+      break;
+    }
+    INFO_LOG(SLIPPI_ONLINE, "Received dolphin type from opponent {}: {}", p_idx, dolphin_type);
+    DolphinType dolphin_type_enum = static_cast<DolphinType>(dolphin_type);
+    if (dolphin_type_enum != m_remote_dolphin_type[p_idx])
+    {
+      WARN_LOG(SLIPPI_ONLINE, "Dolphin type changed for player {}: {}", p_idx, dolphin_type);
+    }
+    m_remote_dolphin_type[p_idx] = dolphin_type_enum;
+  }
+  break;
 
 	default:
 		WARN_LOG(SLIPPI_ONLINE, "Unknown message received with id : %d", mid);
@@ -1218,6 +1249,20 @@ void SlippiNetplayClient::SendSyncedGameState(SlippiSyncedGameState &s) {
 		*spac << s.fighters[i].current_health;
 	}
 	SendAsync(std::move(spac));
+}
+
+void SlippiNetplayClient::SendDolphinType()
+{
+  if (m_sent_dolphin_type)
+    return;
+
+  auto spac = std::make_unique<sf::Packet>();
+  *spac << static_cast<u8>(NP_MSG_SLIPPI_DOLPHIN_TYPE);
+  *spac << this->playerIdx;
+  *spac << static_cast<u8>(DolphinType::HUMAN_VS_BOT);
+  SendAsync(std::move(spac));
+
+  m_sent_dolphin_type = true;
 }
 
 bool SlippiNetplayClient::GetGamePrepResults(u8 stepIdx, SlippiGamePrepStepResults &res)
